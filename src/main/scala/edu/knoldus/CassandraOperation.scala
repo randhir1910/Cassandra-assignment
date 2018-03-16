@@ -6,6 +6,7 @@ import scala.collection.JavaConverters._
 
 object CassandraOperation extends App with CassandraConfiguration {
 
+  session.getCluster.getConfiguration.getQueryOptions.setConsistencyLevel(ConsistencyLevel.QUORUM)
   createTable(session)
   insertRecord(session)
   getRecordById(session, 2)
@@ -13,13 +14,12 @@ object CassandraOperation extends App with CassandraConfiguration {
   getRecordBySalary(session, 4000, 1)
   getRecordByCity(session, "chandigarh")
   deleteRecordByCity(session, "chandigarh")
-
-  session.getCluster.getConfiguration.getQueryOptions.setConsistencyLevel(ConsistencyLevel.QUORUM)
+  session.close()
 
   private def createTable(session: Session): Unit = {
-    session.execute("create table if not exists emp (id int, name text, city text,salary varint, phone varint, primary key((salary),id))")
+    session.execute("drop table emp")
+    session.execute("create table if not exists emp (id int, name text, city text,salary varint, phone varint, primary key(id,salary))")
     session.execute("create table if not exists emp1(id int, name text, city text,salary varint, phone varint, primary key(city))")
-    session.execute("create index idIndex on emp(id)")
     session.execute("create index cityIndex on emp(city)")
   }
 
@@ -55,8 +55,8 @@ object CassandraOperation extends App with CassandraConfiguration {
   }
 
   private def getRecordBySalary(session: Session, salary: Int, id: Int): Unit = {
-    val record = session.execute(s"select * from emp where id =${id} AND token(salary) <= token(${salary})")
-    println("greater than 30000")
+    val record = session.execute(s"select * from emp where id =${id} AND salary > ${salary} ")
+    println("fetch record salary where greater than 30000")
     record.forEach(println(_))
     println()
   }
