@@ -14,7 +14,10 @@ object CassandraOperation extends App with CassandraConfiguration {
   getRecordBySalary(session, 4000, 1)
   getRecordByCity(session, "chandigarh")
   deleteRecordByCity(session, "chandigarh")
-  session.close()
+
+  if(!session.isClosed){
+    session.close()
+  }
 
   private def createTable(session: Session): Unit = {
     session.execute("drop table emp")

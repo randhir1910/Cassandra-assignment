@@ -7,7 +7,6 @@ trait CassandraConfiguration {
 
   val config = ConfigFactory.load()
   val cassandraKeyspace = config.getString("cassandra.keyspace")
-  val cassandraHostname = config.getString("cassandra.contact.points")
 
   val cluster = new Cluster.Builder().withClusterName("Knoldus").
       addContactPoints("localhost").build
